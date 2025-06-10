@@ -23,6 +23,8 @@ export function IconButton({ transparent, href, children, ...props }: IconButton
     <button
       {...props}
       className={`rounded-md p-1.5 ${props.disabled ? "opacity-50" : null}`}
-    />
+    >
+      {children}
+    </button>
   )
 }

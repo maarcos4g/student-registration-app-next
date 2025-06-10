@@ -5,6 +5,7 @@ import { TableCell } from "@/components/table/table-cell";
 import { TableHeader } from "@/components/table/table-header";
 import { TableRow } from "@/components/table/table-row";
 import { getStudents } from "@/http/get-all-students";
+import { calculateAge } from "@/utils/calculate-age";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Trash2, UserPen } from "lucide-react";
 
 interface HomeProps {
@@ -52,7 +53,9 @@ export default async function Home({ searchParams }: HomeProps) {
 
                 <TableCell>{student.course}</TableCell>
                 <TableCell>{student.registration}</TableCell>
-                <TableCell>20 anos</TableCell>
+                <TableCell>
+                  {calculateAge(student.birthDate)} anos
+                </TableCell>
                 <TableCell>
                   <div className="flex gap-1.5 items-center">
                     <IconButton transparent>
