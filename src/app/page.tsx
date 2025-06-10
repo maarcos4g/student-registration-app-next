@@ -4,9 +4,26 @@ import { Table } from "@/components/table";
 import { TableCell } from "@/components/table/table-cell";
 import { TableHeader } from "@/components/table/table-header";
 import { TableRow } from "@/components/table/table-row";
-import { Eye, Trash2, UserPen } from "lucide-react";
+import { getStudents } from "@/http/get-all-students";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Trash2, UserPen } from "lucide-react";
 
-export default function Home() {
+interface HomeProps {
+  searchParams: {
+    page?: string
+  }
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const currentPage = Number(searchParams.page) || 1
+  const pageIndex = currentPage - 1
+
+  const { students, count: total } = await getStudents({ pageIndex })
+
+  const totalPages = Math.ceil(total / 10)
+
+  const isFirstPage = currentPage === 1
+  const isLastPage = currentPage === totalPages
+
   return (
     <main className="w-full min-h-screen bg-zinc-50 px-8 py-6">
       <Header />
@@ -23,18 +40,18 @@ export default function Home() {
         </thead>
 
         <tbody>
-          {Array.from({ length: 10 }).map((_, index) => {
+          {students.map((student) => {
             return (
-              <TableRow key={index}>
+              <TableRow key={student.id}>
                 <TableCell>
                   <div className="flex flex-col gap-1">
-                    <span className="font-semibold text-base text-zinc-900">Marcos Paulo</span>
-                    <p className="font-bold text-sm text-zinc-400">marcospaullo552@gmail.com</p>
+                    <span className="font-semibold text-base text-zinc-900">{student.fullName}</span>
+                    <p className="font-bold text-sm text-zinc-400">{student.email}</p>
                   </div>
                 </TableCell>
 
-                <TableCell>Ciência da Computação</TableCell>
-                <TableCell>0000000000</TableCell>
+                <TableCell>{student.course}</TableCell>
+                <TableCell>{student.registration}</TableCell>
                 <TableCell>20 anos</TableCell>
                 <TableCell>
                   <div className="flex gap-1.5 items-center">
@@ -50,6 +67,48 @@ export default function Home() {
             )
           })}
         </tbody>
+
+        <tfoot>
+          <tr>
+            <TableCell className="text-zinc-900" colSpan={3}>
+              Exibindo {currentPage} de {total} itens
+            </TableCell>
+            <TableCell className="text-right" colSpan={3}>
+              <div className="inline-flex items-center gap-8">
+                <span className="text-zinc-500">
+                  Página {currentPage} de {totalPages}
+                </span>
+
+                <div className="flex gap-1.5">
+                  <IconButton
+                    disabled={isFirstPage}
+                    href={`/?page=1`}
+                  >
+                    <ChevronsLeft className="size-4" />
+                  </IconButton>
+                  <IconButton
+                    disabled={isFirstPage}
+                    href={`/?page=${currentPage - 1}`}
+                  >
+                    <ChevronLeft className="size-4" />
+                  </IconButton>
+                  <IconButton
+                    disabled={isLastPage}
+                    href={`/?page=${currentPage + 1}`}
+                  >
+                    <ChevronRight className="size-4" />
+                  </IconButton>
+                  <IconButton
+                    disabled={isLastPage}
+                    href={`/?page=${totalPages}`}
+                  >
+                    <ChevronsRight className="size-4" />
+                  </IconButton>
+                </div>
+              </div>
+            </TableCell>
+          </tr>
+        </tfoot>
       </Table>
     </main>
   );
